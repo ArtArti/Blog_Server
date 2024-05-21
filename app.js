@@ -12,7 +12,7 @@ dbconnect();
 // Apply CORS middleware
 app.use(
   cors({
-    origin: ["https://blog-wave.vercel.app/"], 
+    origin: ["https://blog-wave.vercel.app"], 
     methods: ['GET', 'POST','PUT','DELETE'], 
     credentials: true,
   })
