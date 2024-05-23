@@ -2,9 +2,10 @@ const Seller = require('../Model/sellerSchema');
 
 // Controller function to create a new property post
 const createPropertyPost = async (req, res) => {
+
   try {
-    const { description, price } = req.body;
-    const newPost = await Seller.create({ description, price });
+    const { title, description, price } = req.body;
+    const newPost = await Seller.create({title, description, price });
     res.status(201).json({ success: true, data: newPost });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -12,10 +13,30 @@ const createPropertyPost = async (req, res) => {
 };
 
 // Controller function to get all property posts
+// const getAllPropertyPosts = async (req, res) => {
+//   try {
+//     const allPosts = await Seller.find();
+//     res.status(200).json({ success: true, data: allPosts });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: 'Server Error' });
+//   }
+// };
+
 const getAllPropertyPosts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   try {
-    const allPosts = await Seller.find();
-    res.status(200).json({ success: true, data: allPosts });
+    const allPosts = await Seller.find().skip(skip).limit(limit);
+    const totalPosts = await Seller.countDocuments();
+    res.status(200).json({
+      success: true,
+      data: allPosts,
+      totalPosts,
+      totalPages: Math.ceil(totalPosts / limit),
+      currentPage: page
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
