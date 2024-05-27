@@ -52,7 +52,7 @@ userSchema.methods = {
   //method for generating the jwt token
   jwtToken() {
     return JWT.sign(
-      { id: this._id, email: this.email, role: this.role },
+      { id: this._id, email: this.email, role: this.role},
       process.env.SECRET,
       { expiresIn: '24h' }
     );
@@ -77,7 +77,6 @@ userSchema.methods = {
   //   //step 2 - return values to user
     return forgotToken;
   }
-
 };
 
 const userModel = mongoose.model('user', userSchema);

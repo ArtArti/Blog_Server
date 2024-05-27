@@ -12,15 +12,6 @@ const createPropertyPost = async (req, res) => {
   }
 };
 
-// Controller function to get all property posts
-// const getAllPropertyPosts = async (req, res) => {
-//   try {
-//     const allPosts = await Seller.find();
-//     res.status(200).json({ success: true, data: allPosts });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: 'Server Error' });
-//   }
-// };
 
 const getAllPropertyPosts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -41,6 +32,17 @@ const getAllPropertyPosts = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+const getPostBySellerId = async () => {
+  const { sellerId } = req.params;
+  try {
+    const posts = await Seller.findById({ seller: sellerId });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 // Controller function to edit a property post
 const editPropertyPost = async (req, res) => {
@@ -86,4 +88,9 @@ const likePropertyPost = async (req, res) => {
     }
   };
 
-module.exports = { createPropertyPost, getAllPropertyPosts, editPropertyPost, likePropertyPost };
+module.exports = { 
+  createPropertyPost, 
+  getAllPropertyPosts, 
+  editPropertyPost, 
+  likePropertyPost,
+  getPostBySellerId };

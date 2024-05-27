@@ -1,7 +1,7 @@
 const JWT = require("jsonwebtoken");
 
 // router level middleware function
-const jwtAuth = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   // get cookie token(jwt token generated using json.sign()) form the request
   const token = (req.cookies && req.cookies.token) || null;
 
@@ -33,4 +33,4 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = {jwtAuth, authorizeRoles};
+module.exports = {isLoggedIn, authorizeRoles};
