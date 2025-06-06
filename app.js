@@ -10,20 +10,17 @@ const cors = require("cors");
 dbconnect();
 
 // Apply CORS middleware
+const allowedOrigin = 'https://art-gallery-client.vercel.app';
+
 app.use(
   cors({
-    origin: ["https://blog-wave.vercel.app"], 
-    methods: ['GET', 'POST','PUT','DELETE'], 
-    credentials: true,
+    origin: allowedOrigin,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,    // allow cookies to be sent
+    exposedHeaders: ['Authorization']
   })
-)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://blog-wave.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+);
+
 
 
 // Use built-in and third-party middleware

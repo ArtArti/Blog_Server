@@ -1,25 +1,65 @@
 const JWT = require("jsonwebtoken");
 
-// router level middleware function
-const isLoggedIn = (req, res, next) => {
-  // get cookie token(jwt token generated using json.sign()) form the request
-  const token = (req.cookies && req.cookies.token) || null;
+const userModel = require('../Model/userSchema'); // Adjust path as needed
 
-  // return response if there is no token(jwt token attached with cookie)
-  if (!token) {
-    return res.status(400).json({ success: false, message: "NOT authorized" });
+
+const isLoggedIn = async (req, res, next) => {
+  // ✅ Get token from Authorization header
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized, please login'
+    });
   }
 
-  // verify the token
+  const token = authHeader.split(' ')[1]; // extract actual token
+
   try {
-    const payload = JWT.verify(token, process.env.SECRET);
-    req.user = { id: payload.id, email: payload.email };
+    // ✅ Verify the token
+    const decoded = jwt.verify(token, process.env.SECRET);
+
+    // ✅ Find user by ID from token
+    const user = await userModel.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // ✅ Attach user to request
+    req.user = user;
+    next();
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(401).json({
+      success: false,
+      message: 'Token is not valid'
+    });
   }
-  next();
 };
 
+// Optional middleware - doesn't block request if not authenticated
+const optionalAuth = async (req, res, next) => {
+  const { token } = req.cookies;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.SECRET);
+      const user = await userModel.findById(decoded.id);
+      if (user) {
+        req.user = user;
+      }
+    } catch (error) {
+      // Token invalid, but don't block request
+      console.log('Invalid token in optional auth');
+    }
+  }
+  
+  next();
+};
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
@@ -33,4 +73,4 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = {isLoggedIn, authorizeRoles};
+module.exports = {isLoggedIn, authorizeRoles,optionalAuth};
